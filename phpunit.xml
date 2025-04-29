@@ -13,8 +13,8 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="Test Suite">
-      <file>tests/CacheTest.php</file>
+    <testsuite name="Unit Tests">
+      <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
   <source>

@@ -5,8 +5,8 @@ RUN apt-get update && apt-get install -y \
 	zip
 
 RUN pecl install xdebug-3.4.2 \
-   && docker-php-ext-enable xdebug
-    
+	&& docker-php-ext-enable xdebug
+
 COPY --from=composer:2.8.1 /usr/bin/composer /usr/bin/composer
 
 COPY . /usr/src/app
