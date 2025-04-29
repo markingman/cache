@@ -3,13 +3,14 @@
 namespace MarkIngman\Cache;
 
 use FilesystemIterator;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use InvalidArgumentException;
 use RuntimeException;
 use SplFileInfo;
 use stdClass;
+use Throwable;
 
 class CacheTest extends TestCase
 {
@@ -275,7 +276,11 @@ class CacheTest extends TestCase
 
 	protected function tmpdir_make(): bool
 	{
-		$this->tmpdir = rtrim(sys_get_temp_dir(), '/') . '/' . bin2hex(random_bytes(4));
+		try {
+			$this->tmpdir = rtrim(sys_get_temp_dir(), '/') . '/' . bin2hex(random_bytes(4));
+		} catch (Throwable $e) {
+			throw new RuntimeException('Could not create tmpdir; ' . $e->getMessage());
+		}
 
 		mkdir($this->tmpdir);
 
