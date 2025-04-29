@@ -268,10 +268,14 @@ class CacheTest extends TestCase
 		$this->Cache->put('test4/file', 'data', 200);// 4
 
 		$this->Cache->gc(101, 2);
+
+		$files = $this->listFiles($this->tmpdir);
+		sort($files);
+
 		$this->assertEquals([
 			$this->tmpdir . '/' . 'test1-file' . Cache::SUFFIX,
 			$this->tmpdir . '/' . 'test4/file' . Cache::SUFFIX,
-		], $this->listFiles($this->tmpdir));
+		], $files);
 	}
 
 	protected function tmpdir_make(): bool
