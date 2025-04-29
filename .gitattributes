@@ -1,0 +1,10 @@
+/.editorconfig        export-ignore
+/.gitattributes       export-ignore
+/.github              export-ignore
+/.gitignore           export-ignore
+/Dockerfile           export-ignore
+/entryponit.sh        export-ignore
+/Makefile             export-ignore
+/phpstan.neon         export-ignore
+/phpunit.xml          export-ignore
+/tests                export-ignore
