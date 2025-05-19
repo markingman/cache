@@ -22,7 +22,8 @@ jobs:
       - name: Build Docker image (PHP ${{ matrix.php-version }})
         run: |
           docker build \
-            --build-arg PHP_VERSION=${{ matrix.php-version }} -t cache-test-php:${{ matrix.php-version }} .
+            --build-arg PHP_VERSION=${{ matrix.php-version }} \
+            -t cache-test-php:${{ matrix.php-version }} .
 
       - name: Run container and execute tests
         run: |
