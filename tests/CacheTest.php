@@ -328,6 +328,8 @@ class CacheTest extends TestCase
 			}
 		}
 
+		sort($files);
+
 		return $files;
 	}
 
