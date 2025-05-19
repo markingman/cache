@@ -264,16 +264,15 @@ class CacheTest extends TestCase
 
 		$this->Cache->put('test1-file', 'data', 100);// 3
 		$this->Cache->put('test2/file', 'data', 100);// 1
-		$this->Cache->put('test3-file', 'data', 100);// 2
+		$this->Cache->put('test3-file', 'data', 150);// 2
 		$this->Cache->put('test4/file', 'data', 200);// 4
 
-		$this->Cache->gc(101, 2);
+		$this->Cache->gc(110, 2);
 
 		$files = $this->listFiles($this->tmpdir);
-		sort($files);
 
 		$this->assertEquals([
-			$this->tmpdir . '/' . 'test1-file' . Cache::SUFFIX,
+			$this->tmpdir . '/' . 'test3-file' . Cache::SUFFIX,
 			$this->tmpdir . '/' . 'test4/file' . Cache::SUFFIX,
 		], $files);
 	}
