@@ -9,6 +9,22 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RuntimeException;
 use SplFileInfo;
+use function dirname;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function fileperms;
+use function in_array;
+use function is_dir;
+use function is_null;
+use function json_decode;
+use function json_encode;
+use function mkdir;
+use function rename;
+use function rmdir;
+use function tempnam;
+use function time;
+use function touch;
 use const JSON_THROW_ON_ERROR;
 
 class Cache implements CacheInterface
