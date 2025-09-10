@@ -1,6 +1,6 @@
 {
   "name": "markingman/cache",
-  "description": "Simple PHP file cache.",
+  "description": "Simple PHP file cache",
   "license": "MIT",
   "type": "library",
   "require": {
