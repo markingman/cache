@@ -14,7 +14,7 @@ build8.4: ## Build a PHP 8.4 Docker image for local development
 	@docker build --build-arg PHP_VERSION=8.4 -t $(NAME) .
 
 test: ## Run tests
-	@docker run -it --rm -v `pwd`/src:/usr/src/app/src -v `pwd`/tests:/usr/src/app/tests -v `pwd`/phpunit-coverage:/usr/src/app/phpunit-coverage $(NAME) vendor/bin/phpunit
+	@docker run -it --rm -e XDEBUG_MODE=coverage -v `pwd`/src:/usr/src/app/src -v `pwd`/tests:/usr/src/app/tests -v `pwd`/phpunit-coverage:/usr/src/app/phpunit-coverage $(NAME) vendor/bin/phpunit
 
 analyse: ## Run analyse
 	@docker run -it --rm -v `pwd`/src:/usr/src/app/src -v `pwd`/tests:/usr/src/app/tests $(NAME) vendor/bin/phpstan analyse -c phpstan.neon
