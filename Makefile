@@ -13,6 +13,9 @@ build8.3: ## Build a PHP 8.3 Docker image for local development
 build8.4: ## Build a PHP 8.4 Docker image for local development
 	@docker build --build-arg PHP_VERSION=8.4 -t $(NAME) .
 
+build8.5: ## Build a PHP 8.5 Docker image for local development
+	@docker build --build-arg PHP_VERSION=8.5 -t $(NAME) .
+
 test: ## Run tests
 	@docker run -it --rm -e XDEBUG_MODE=coverage -v `pwd`/src:/usr/src/app/src -v `pwd`/tests:/usr/src/app/tests -v `pwd`/phpunit-coverage:/usr/src/app/phpunit-coverage $(NAME) vendor/bin/phpunit
 
