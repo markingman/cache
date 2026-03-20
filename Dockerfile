@@ -25,4 +25,4 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 WORKDIR /usr/src/app
 COPY . .
 
-RUN /usr/bin/composer install --prefer-dist
+RUN /usr/bin/composer install --prefer-dist --no-interaction
