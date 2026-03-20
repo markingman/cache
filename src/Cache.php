@@ -170,7 +170,7 @@ class Cache implements CacheInterface
 		return $n;
 	}
 
-	function decode(string $value): mixed
+	protected function decode(string $value): mixed
 	{
 		try {
 			return json_decode($value, true, 512, JSON_THROW_ON_ERROR);
