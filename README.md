@@ -38,7 +38,7 @@ Create a new cache instance.
 
 - `$path` — Directory where cache files are stored
 
-### `put(string $key, mixed $value, int $ttl)`
+### `put(string $key, mixed $value, ?int $ttl = null)`
 Store a value in the cache.
 
 - `$key` — Cache key  
@@ -54,6 +54,7 @@ Retrieve a value from the cache.
 
 - Cache is file-based (no external dependencies)
 - Ensure the cache directory is writable
+- Can use interface to evolve to other storage (e.g. Redis, SQL etc)
 
 ## License
 
