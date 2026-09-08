@@ -1,6 +1,6 @@
 # Cache Handler
 
-A simple file-based cache for PHP.
+A simple file-based cache for PHP applications.
 
 ## Status
 
@@ -15,40 +15,49 @@ Install via Composer:
 composer require markingman/cache
 ```
 
-## Usage
+## Usage Overview
+
+Instantiate with path to cache directory default TTL.
 
 ```php
-<?php
+$cache = new Cache('/path/to/cache/store', 3600);
+```
 
-use MarkIngman\Cache\Cache;
+Put values by index name and optional TTL override.
 
-$cache = new Cache('/path/to/cache/store');
-
+```php
 $cache->put('index-name', 'cache-value', 900);
+```
 
-if ($value = $cache->get('index-name')) {
+Get values by index name.
+
+```php
+$value = $cache->get('index-name');
+
+if (!empty($value) and is_string($value)) {
     echo $value;
 }
 ```
 
-## API
+Forward slash indexes create sub directories.
 
-### `__construct(string $path)`
-Create a new cache instance.
+```php
+$value = $cache->get('sub/path/index-name');
+```
 
-- `$path` — Directory where cache files are stored
+Values are JSON encoded.
 
-### `put(string $key, mixed $value, ?int $ttl = null)`
-Store a value in the cache.
+```php
+$value1 = $cache->put('index1', true);
+$value2 = $cache->put('index2', 123);
+$value3 = $cache->put('index3', (object)['one' => 'test']);
+$value4 = $cache->put('index4', $complexObject->custom_serialize());
+```
 
-- `$key` — Cache key  
-- `$value` — Value to store  
-- `$ttl` — Time to live (seconds)
-
-### `get(string $key): mixed|null`
-Retrieve a value from the cache.
-
-- Returns cached value or `null` if expired/not found
+Call clean up periodically.
+```php
+$cache->gc(max: 1000);
+```
 
 ## Notes
 
