@@ -42,6 +42,10 @@ if (!empty($value) and is_string($value)) {
 
 Forward slash indexes create sub directories.
 
+Keys must contain only ASCII letters, digits, underscores, and hyphens, with single
+forward slashes separating nonempty segments (for example, `products/user_123`).
+Invalid keys throw `InvalidArgumentException` before filesystem operations.
+
 ```php
 $value = $cache->get('sub/path/index-name');
 ```

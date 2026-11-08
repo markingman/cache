@@ -62,7 +62,9 @@ class Cache implements CacheInterface
 
 	public function put(string $key, mixed $cache, ?int $ttl = null): bool
 	{
-		if (strpos($key, DIRECTORY_SEPARATOR)) {
+		$fp = $this->get_path($key);
+
+		if (str_contains($key, '/')) {
 			$dir = dirname($key);
 			if (!file_exists($this->dir . DIRECTORY_SEPARATOR . $dir)) {
 				mkdir(directory: $this->dir . DIRECTORY_SEPARATOR . $dir, recursive: true);
@@ -76,7 +78,7 @@ class Cache implements CacheInterface
 		if (file_put_contents($tmp, $this->encode($cache))) {
 			touch($tmp, time() + ($ttl ?? $this->ttl_default));
 
-			return rename($tmp, $this->get_path($key));
+			return rename($tmp, $fp);
 		} else {
 			return false;
 		}
@@ -181,7 +183,16 @@ class Cache implements CacheInterface
 
 	protected function get_path(string $key): string
 	{
-		return $this->dir . DIRECTORY_SEPARATOR . $key . static::SUFFIX;
+		$this->validate_key($key);
+
+		return $this->dir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $key) . static::SUFFIX;
+	}
+
+	protected function validate_key(string $key): void
+	{
+		if (preg_match('~\A[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*\z~', $key) !== 1) {
+			throw new InvalidArgumentException('Invalid cache key');
+		}
 	}
 
 	protected function encode(mixed $value): string

@@ -4,6 +4,7 @@ namespace MarkIngman\Cache;
 
 use FilesystemIterator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -85,8 +86,52 @@ class CacheTest extends TestCase
 		$this->expectException(RuntimeException::class);
 		$this->expectExceptionMessage('Trying to write cache directory where file exists');
 
-		$this->Cache->put('path', 'data');
-		$this->Cache->put('path' . Cache::SUFFIX . '/file', 'data');
+		file_put_contents($this->tmpdir . '/path', 'data');
+		$this->Cache->put('path/file', 'data');
+	}
+
+	public function testPutValidKey(): void
+	{
+		$key = 'product-cache/user_123';
+		$this->assertTrue($this->Cache->put($key, 'data'));
+		$this->assertSame('data', $this->Cache->get($key));
+	}
+
+	#[DataProvider('invalidKeys')]
+	public function testRejectInvalidKey(string $key): void
+	{
+		foreach (['put', 'get', 'test', 'delete'] as $method) {
+			try {
+				if ($method === 'put') {
+					$this->Cache->put($key, 'data');
+				} else {
+					$this->Cache->$method($key);
+				}
+				$this->fail($method . ' accepted an invalid key');
+			} catch (InvalidArgumentException $e) {
+				$this->assertSame('Invalid cache key', $e->getMessage());
+			}
+		}
+		$this->assertSame([], array_values(array_diff(scandir($this->tmpdir) ?: [], ['.', '..'])));
+	}
+
+	/** @return array<string, array{string}> */
+	public static function invalidKeys(): array
+	{
+		return [
+			'empty' => [''],
+			'traversal' => ['../outside'],
+			'nested traversal' => ['products/../outside'],
+			'absolute' => ['/absolute/path'],
+			'trailing separator' => ['products/'],
+			'repeated separators' => ['products///123'],
+			'separators only' => ['///'],
+			'backslash' => ['products\\123'],
+			'dot' => ['file.json'],
+			'space' => ['product cache'],
+			'null byte' => ["product\0cache"],
+			'final newline' => ["product\n"],
+		];
 	}
 
 	public function testPutBoolean(): void
