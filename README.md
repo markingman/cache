@@ -1,11 +1,12 @@
 # Cache Handler
 
-A simple file-based cache for PHP applications.
+A lightweight file-based cache for PHP applications.
 
 ## Status
 
-This is a small utility library shared for convenience.  
-Maintenance is best-effort and may be minimal.
+This is a small utility library shared for convenience. Maintenance is best-effort and may be minimal.
+
+This repository is published for use and reference. External contributions are not currently being accepted.
 
 ## Installation
 
