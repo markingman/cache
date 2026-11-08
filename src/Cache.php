@@ -87,7 +87,8 @@ class Cache implements CacheInterface
 	public function get(string $key, ?int $ttl = null): mixed
 	{
 		if ($this->test($key, $ttl ?? 0)) {
-			if ($cache = (string)file_get_contents($this->get_path($key))) {
+			$cache = file_get_contents($this->get_path($key));
+			if ($cache !== false) {
 				return $this->decode($cache);
 			}
 		}

@@ -189,6 +189,13 @@ class CacheTest extends TestCase
 		$this->assertFalse($this->Cache->get($key));
 	}
 
+	public function testGetZero(): void
+	{
+		$key = 'get/zero';
+		$this->assertTrue($this->Cache->put($key, 0));
+		$this->assertSame(0, $this->Cache->get($key));
+	}
+
 // 	public function testPermission(): void
 // 	{
 // 		$path = 'permission/test';
