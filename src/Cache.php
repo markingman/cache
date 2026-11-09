@@ -68,7 +68,7 @@ class Cache implements CacheInterface
 		if (str_contains($key, '/')) {
 			$dir = dirname($key);
 			if (!file_exists($this->dir . DIRECTORY_SEPARATOR . $dir)) {
-				mkdir(directory: $this->dir . DIRECTORY_SEPARATOR . $dir, recursive: true);
+				mkdir($this->dir . DIRECTORY_SEPARATOR . $dir, $this->prm, true);
 			} elseif (!is_dir($this->dir . DIRECTORY_SEPARATOR . $dir)) {
 				throw new RuntimeException('Trying to write cache directory where file exists');
 			}
