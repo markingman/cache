@@ -74,13 +74,22 @@ class Cache implements CacheInterface
 		}
 
 		$tmp = tempnam($this->dir, 'tmp');
-
-		if (file_put_contents($tmp, $this->encode($cache))) {
-			touch($tmp, time() + ($ttl ?? $this->ttl_default));
-
-			return rename($tmp, $fp);
-		} else {
+		if ($tmp === false) {
 			return false;
+		}
+
+		try {
+			if (file_put_contents($tmp, $this->encode($cache))) {
+				touch($tmp, time() + ($ttl ?? $this->ttl_default));
+
+				return rename($tmp, $fp);
+			}
+
+			return false;
+		} finally {
+			if (file_exists($tmp)) {
+				unlink($tmp);
+			}
 		}
 	}
 

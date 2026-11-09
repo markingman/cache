@@ -90,6 +90,15 @@ class CacheTest extends TestCase
 		$this->Cache->put('path/file', 'data');
 	}
 
+	public function testPutRenameFailureRemovesTemporaryFile(): void
+	{
+		mkdir($this->tmpdir . '/blocked.cache');
+
+		$this->assertFalse(@$this->Cache->put('blocked', 'data'));
+		$this->assertSame([], glob($this->tmpdir . '/tmp*'));
+		$this->assertDirectoryExists($this->tmpdir . '/blocked.cache');
+	}
+
 	public function testPutValidKey(): void
 	{
 		$key = 'product-cache/user_123';
