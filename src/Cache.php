@@ -109,14 +109,15 @@ class Cache implements CacheInterface
 	public function delete(string $key, ?int $max = null): bool
 	{
 		$max ??= PHP_INT_MAX;
-		$n = 0;
-		$fp = $this->get_path($key);
-		$dp = substr($fp, 0, -strlen(static::SUFFIX));
-		$deleted = false;
 
 		if ($max <= 0) {
 			return false;
 		}
+
+		$n = 0;
+		$fp = $this->get_path($key);
+		$dp = substr($fp, 0, -strlen(static::SUFFIX));
+		$deleted = false;
 
 		if (is_file($fp)) {
 			if (!unlink($fp)) {
@@ -171,6 +172,11 @@ class Cache implements CacheInterface
 	public function gc(?int $ttl = null, ?int $max = null): int
 	{
 		$max ??= PHP_INT_MAX;
+
+		if ($max <= 0) {
+			return 0;
+		}
+
 		$n = 0;
 		$t = time() + ($ttl ?? 0);
 		$t_tmp = time() - 300;
