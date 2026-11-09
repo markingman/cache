@@ -81,7 +81,9 @@ class Cache implements CacheInterface
 
 		try {
 			if (file_put_contents($tmp, $this->encode($cache))) {
-				touch($tmp, time() + ($ttl ?? $this->ttl_default));
+				if (!touch($tmp, time() + ($ttl ?? $this->ttl_default))) {
+					return false;
+				}
 
 				return rename($tmp, $fp);
 			}
