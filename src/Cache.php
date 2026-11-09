@@ -30,6 +30,7 @@ use const JSON_THROW_ON_ERROR;
 class Cache implements CacheInterface
 {
 	const string SUFFIX = '.cache';
+	const string TMP_PREFIX = 'cache.';
 
 	protected string $dir;
 	protected int $prm = 0700;
@@ -73,7 +74,7 @@ class Cache implements CacheInterface
 			}
 		}
 
-		$tmp = tempnam($this->dir, 'tmp');
+		$tmp = tempnam($this->dir, static::TMP_PREFIX);
 		if ($tmp === false) {
 			return false;
 		}
@@ -155,6 +156,7 @@ class Cache implements CacheInterface
 		$max ??= PHP_INT_MAX;
 		$n = 0;
 		$t = time() + ($ttl ?? 0);
+		$t_tmp = time() - 300;
 
 		foreach (
 			new RecursiveIteratorIterator(
@@ -168,7 +170,12 @@ class Cache implements CacheInterface
 						rmdir($f->getPathname());
 					}
 				} else {
-					if ($f->getMtime() < $t and str_ends_with($f->getPathname(), static::SUFFIX)) {
+					$is_cache = str_ends_with($f->getFilename(), static::SUFFIX);
+					$is_stale_tmp = (!$is_cache and str_starts_with($f->getFilename(), static::TMP_PREFIX));
+					if (
+						($is_cache and $f->getMtime() < $t) 
+						or ($is_stale_tmp and $f->getMtime() < $t_tmp)
+					) {
 						unlink($f->getPathname());
 						$n++;
 					}

@@ -95,7 +95,7 @@ class CacheTest extends TestCase
 		mkdir($this->tmpdir . '/blocked.cache');
 
 		$this->assertFalse(@$this->Cache->put('blocked', 'data'));
-		$this->assertSame([], glob($this->tmpdir . '/tmp*'));
+		$this->assertSame([], glob($this->tmpdir . '/' . Cache::TMP_PREFIX . '*'));
 		$this->assertDirectoryExists($this->tmpdir . '/blocked.cache');
 	}
 
@@ -336,6 +336,25 @@ class CacheTest extends TestCase
 			$this->tmpdir . '/' . 'test3-file' . Cache::SUFFIX,
 			$this->tmpdir . '/' . 'test4/file' . Cache::SUFFIX,
 		], $files);
+	}
+
+	public function testGCRemovesOnlyStaleTemporaryFiles(): void
+	{
+		$old = $this->tmpdir . '/' . Cache::TMP_PREFIX . 'old';
+		$recent = $this->tmpdir . '/' . Cache::TMP_PREFIX . 'recent';
+		$unrelated = $this->tmpdir . '/unrelated';
+		foreach ([$old, $recent, $unrelated] as $file) {
+			file_put_contents($file, 'data');
+		}
+		touch($old, time() - 600);
+		touch($unrelated, time() - 600);
+		$this->Cache->put('cache', 'data', 3600);
+
+		$this->assertSame(1, $this->Cache->gc(ttl: 1000, max: 1));
+		$this->assertFileDoesNotExist($old);
+		$this->assertFileExists($recent);
+		$this->assertFileExists($unrelated);
+		$this->assertSame('data', $this->Cache->get('cache'));
 	}
 
 	protected function tmpdir_make(): bool
