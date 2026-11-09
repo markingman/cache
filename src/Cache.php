@@ -201,11 +201,12 @@ class Cache implements CacheInterface
 					$is_cache = str_ends_with($f->getFilename(), static::SUFFIX);
 					$is_stale_tmp = (!$is_cache and str_starts_with($f->getFilename(), static::TMP_PREFIX));
 					if (
-						($is_cache and $f->getMtime() < $t) 
+						($is_cache and $f->getMtime() < $t)
 						or ($is_stale_tmp and $f->getMtime() < $t_tmp)
 					) {
-						unlink($f->getPathname());
-						$n++;
+						if (unlink($f->getPathname())) {
+							$n++;
+						}
 					}
 				}
 			}
