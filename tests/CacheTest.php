@@ -296,6 +296,33 @@ class CacheTest extends TestCase
 		$this->assertEquals('', $this->Cache->get($key));
 	}
 
+	public function testDeleteEntryAndDescendants(): void
+	{
+		$this->Cache->put('group', 'parent');
+		$this->Cache->put('group/nested/child', 'child');
+		$this->Cache->put('unrelated', 'keep');
+
+		$this->assertTrue($this->Cache->delete('group'));
+		$this->assertFileDoesNotExist($this->tmpdir . '/group.cache');
+		$this->assertDirectoryDoesNotExist($this->tmpdir . '/group');
+		$this->assertSame('keep', $this->Cache->get('unrelated'));
+	}
+
+	public function testDeleteSharesLimitWithDescendants(): void
+	{
+		$this->Cache->put('group', 'parent');
+		$this->Cache->put('group/child', 'child');
+		$cache = new Cache($this->tmpdir);
+
+		$this->assertFalse($cache->delete('group', 0));
+		$this->assertSame('parent', $cache->get('group'));
+		$this->assertFalse($cache->delete('group', 1));
+		$this->assertFileDoesNotExist($this->tmpdir . '/group.cache');
+		$this->assertSame('child', $cache->get('group/child'));
+		$this->assertTrue($cache->delete('group', 1));
+		$this->assertDirectoryDoesNotExist($this->tmpdir . '/group');
+	}
+
 	public function testTest(): void
 	{
 		$key = 'test';

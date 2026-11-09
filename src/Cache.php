@@ -111,37 +111,54 @@ class Cache implements CacheInterface
 		$max ??= PHP_INT_MAX;
 		$n = 0;
 		$fp = $this->get_path($key);
+		$dp = substr($fp, 0, -strlen(static::SUFFIX));
+		$deleted = false;
 
-		if (is_dir($fp)) {
+		if ($max <= 0) {
+			return false;
+		}
+
+		if (is_file($fp)) {
+			if (!unlink($fp)) {
+				return false;
+			}
+
+			$n++;
+			$deleted = true;
+		}
+
+		if (is_dir($dp)) {
 			foreach (
 				new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator($fp, FilesystemIterator::SKIP_DOTS),
+					new RecursiveDirectoryIterator($dp, FilesystemIterator::SKIP_DOTS),
 					RecursiveIteratorIterator::CHILD_FIRST
 				)
 				as $f) {
 				if ($f instanceof SplFileInfo) {
 					if ($f->isDir()) {
 						if (!(new FilesystemIterator($f->getPathname()))->valid()) {
-							rmdir($f->getPathname());
+							if (!rmdir($f->getPathname())) {
+								return false;
+							}
 						}
-					} elseif (str_ends_with($f->getPathname(), static::SUFFIX)) {
-						unlink($f->getPathname());
+					} elseif (str_ends_with($f->getFilename(), static::SUFFIX)) {
+						if ($n >= $max || !unlink($f->getPathname())) {
+							return false;
+						}
+
 						$n++;
 					}
 				}
-				if ($n >= $max) {
-					return false;
-				}
 			}
 
-			if (!(new FilesystemIterator($fp))->valid()) {
-				return rmdir($fp);
+			if (!(new FilesystemIterator($dp))->valid()) {
+				return rmdir($dp);
 			}
-		} elseif (is_file($fp) and str_ends_with($fp, static::SUFFIX)) {
-			return unlink($fp);
+
+			return false;
 		}
 
-		return false;
+		return $deleted;
 	}
 
 	public function test(string $key, int $ttl = 0): bool
