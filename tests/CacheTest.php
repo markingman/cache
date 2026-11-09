@@ -84,10 +84,19 @@ class CacheTest extends TestCase
 	public function testPutFailDir(): void
 	{
 		$this->expectException(RuntimeException::class);
-		$this->expectExceptionMessage('Trying to write cache directory where file exists');
+		$this->expectExceptionMessage('Could not create cache directory');
 
 		file_put_contents($this->tmpdir . '/path', 'data');
 		$this->Cache->put('path/file', 'data');
+	}
+
+	public function testPutCreatesAndReusesNestedDirectory(): void
+	{
+		$this->assertTrue($this->Cache->put('parent/nested/first', 'first'));
+		$this->assertDirectoryExists($this->tmpdir . '/parent/nested');
+		$this->assertTrue($this->Cache->put('parent/nested/second', 'second'));
+		$this->assertSame('first', $this->Cache->get('parent/nested/first'));
+		$this->assertSame('second', $this->Cache->get('parent/nested/second'));
 	}
 
 	public function testPutRenameFailureRemovesTemporaryFile(): void
@@ -392,7 +401,7 @@ class CacheTest extends TestCase
 			throw new RuntimeException('Could not create tmpdir; ' . $e->getMessage());
 		}
 
-		mkdir($this->tmpdir);
+		mkdir($this->tmpdir, 0700);
 
 		return file_exists($this->tmpdir);
 	}

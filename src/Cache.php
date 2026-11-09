@@ -66,11 +66,12 @@ class Cache implements CacheInterface
 		$fp = $this->get_path($key);
 
 		if (str_contains($key, '/')) {
-			$dir = dirname($key);
-			if (!file_exists($this->dir . DIRECTORY_SEPARATOR . $dir)) {
-				mkdir($this->dir . DIRECTORY_SEPARATOR . $dir, $this->prm, true);
-			} elseif (!is_dir($this->dir . DIRECTORY_SEPARATOR . $dir)) {
-				throw new RuntimeException('Trying to write cache directory where file exists');
+			$dir = dirname($fp);
+			if (!is_dir($dir)) {
+				@mkdir($dir, $this->prm, true);
+				if (!is_dir($dir)) {
+					throw new RuntimeException('Could not create cache directory');
+				}
 			}
 		}
 
@@ -136,7 +137,8 @@ class Cache implements CacheInterface
 					new RecursiveDirectoryIterator($dp, FilesystemIterator::SKIP_DOTS),
 					RecursiveIteratorIterator::CHILD_FIRST
 				)
-				as $f) {
+				as $f
+			) {
 				if ($f instanceof SplFileInfo) {
 					if ($f->isDir()) {
 						if (!(new FilesystemIterator($f->getPathname()))->valid()) {
@@ -188,7 +190,8 @@ class Cache implements CacheInterface
 				new RecursiveDirectoryIterator($this->dir, FilesystemIterator::SKIP_DOTS),
 				RecursiveIteratorIterator::CHILD_FIRST
 			)
-			as $f) {
+			as $f
+		) {
 			if ($f instanceof SplFileInfo) {
 				if ($f->isDir()) {
 					if (!(new FilesystemIterator($f->getPathname()))->valid()) {
